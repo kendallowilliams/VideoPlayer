@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="application-name" content="" />
+        <meta name="author" content="Kendall O. Williams" />
+        <meta name="description" content="" />
+        <meta name="generator" content="" />
+        <meta name="keywords" content="" />
+
+        <link rel="stylesheet" href="CSS/style.css" type="text/css" />
+        <script src="scripts/global.js" type="text/javascript"></script>
+        <script src="scripts/script.js" type="text/javascript"></script>
+
+        <title>KOWflix</title>
+    </head>
+
+    <body onload="init()">
+        <div class="page">
+            <div class="header">
+                <h2>KOWflix</h2>
+            </div>
+            <div class="main">
+                <div id="player_box" class="player_box">
+                    <div id="video_box" class="video_box">
+                        <video id="video" controls="controls" ontimeupdate="updateTime()" onended="autoPlay()"></video>
+                    </div>
+                    <div id="browse_box" class="browse_box">
+                        <div id="browse">
+                            <table id="series_table" class="series_table">
+                                <thead>
+                                    <tr>
+                                        <th>&#8595; Series &#8595;</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="series_tbody">
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>&#8678; Go to Episodes &#8226; Go to Seasons &#8680; &#8226; &#8679; Move up &#8226; Move down &#8681;</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <table id="season_table" class="season_table">
+                                <thead>
+                                    <tr>
+                                        <th>&#8595; Seasons &#8595;</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="season_tbody">
+                                    <tr>
+                                        <td style="vertical-align: top">Go back: select a <i>series</i> to view seasons.</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>&#8678; Go to Series &#8226; Go to Episodes &#8680; &#8226; &#8679; Move up &#8226; Move down &#8681;</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <table id="episode_table" class="episode_table">
+                                <thead>
+                                    <tr>
+                                        <th>&#8595; Episodes &#8595;</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="episode_tbody">
+                                    <tr>
+                                        <td style="vertical-align: top">Go back: select a <i>season</i> to view episodes.</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td>&#8678; Go to Seasons &#8226; Go to Series &#8680; &#8226; &#8679; Move up &#8226; Move down &#8681;</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="controls_box" class="controls_box">
+                        <img id="controls_img" alt="controls" src="images/controls_normal.png" usemap="#controls_map" />
+                        <map name="controls_map" id="controls_map" ondblclick="return false;">
+                            <area shape="circle" coords="25,125,25" onclick="left()" onmouseout="updateControlsImage('normal')" onmouseover="updateControlsImage('left')" href="javascript:void(0)" alt="left" />
+                            <area shape="circle" coords="125,25,25" onclick="up()" onmouseout="updateControlsImage('normal')" onmouseover="updateControlsImage('up')" href="javascript:void(0)" alt="up" />
+                            <area shape="circle" coords="225,125,25" onclick="right()" onmouseout="updateControlsImage('normal')" onmouseover="updateControlsImage('right')" href="javascript:void(0)" alt="right" />
+                            <area shape="circle" coords="125,225,25" onclick="down()" onmouseout="updateControlsImage('normal')" onmouseover="updateControlsImage('down')" href="javascript:void(0)" alt="down" />
+                            <area shape="rect" coords="75,75,175,175" onclick="center()" onmouseout="updateControlsImage('normal')" onmouseover="updateControlsImage('center')" href="javascript:void(0)" alt="center" />
+                        </map>
+                    </div>
+                    <div id="time_box" class="time_box">
+                        <label id="time"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <span>&copy; 2013 Kendall O. Williams</span>
+            </div>
+        </div>
+    </body>
+</html>

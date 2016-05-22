@@ -1,0 +1,135 @@
+/* GLOBAL */
+
+body
+{
+    background-color: black;
+}
+
+/* ELEMENTS */
+
+img
+{
+    border: none;
+}
+
+button
+{
+    width: 100%;
+    height: 100%;
+}
+
+table
+{
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+}
+
+map
+{
+}
+
+area
+{
+    outline: none;
+}
+
+thead
+{
+    height: 15%;
+    color: white;
+    background-color: black;
+}
+
+tbody
+{
+    background-color: whitesmoke;
+}
+
+tfoot
+{
+    height: 10%;
+    color: white;
+    background-color: black;
+}
+
+th
+{
+    font-size: x-large;
+}
+
+/* CUSTOM */
+
+.page
+{
+}
+
+.header
+{
+    text-align: center;
+    color: white;
+}
+
+.main
+{
+}
+
+.player_box
+{
+    position: relative;
+    background-image: url('../images/player.png');
+    background-repeat: no-repeat;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.video_box
+{
+    position: absolute;
+    background-color: black;
+}
+
+.browse_box
+{
+    position: absolute;
+    overflow: hidden;
+}
+
+.controls_box
+{
+    position: absolute;
+}
+
+.time_box
+{
+    position: absolute;
+    color: white;
+    font-size: large;
+}
+
+.series_table
+{
+}
+
+.season_table
+{
+}
+
+.episode_table
+{
+}
+
+.footer
+{
+    color: gray;
+    text-align: center;
+}
+
+.controls
+{
+}
+
+.time
+{
+}
