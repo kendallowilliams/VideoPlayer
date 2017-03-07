@@ -8,6 +8,7 @@ function init()
     initContainers();
     initScreens();
     initTables();
+	initPlayer();
 }
 
 /*
@@ -69,6 +70,14 @@ function initTables()
     player.season_table.style.display = "none";
     player.episode_table.style.display = "none";
     player.series_table.style.display = "table";
+}
+
+function initPlayer()
+{
+    var player = new Player();
+  	player.video.onerror = function () {
+     	playNext();
+    };
 }
 
  /*
