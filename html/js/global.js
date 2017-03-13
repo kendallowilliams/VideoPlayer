@@ -38,7 +38,7 @@ var Player = function()
     this.season_tBody = this.season_table.tBodies.namedItem("season_tbody");
     this.episode_tBody = this.episode_table.tBodies.namedItem("episode_tbody");
     this.ctrl_img = document.getElementById("controls_img");
-}
+};
 
 /*  NORMAL-USE PATHS    */
 //var VIDEO_DIR = "/video/";      // video directory of the server
@@ -46,7 +46,7 @@ var CGI_DIR = "/cgi-bin/";      // script directory on the sever
 var SERIES_SCRIPT = CGI_DIR + "video_player.sh?type=series";
 var SEASON_SCRIPT = CGI_DIR + "video_player.sh?type=season";
 var EPISODE_SCRIPT = CGI_DIR + "video_player.sh?type=episode";
-var FILE_SCRIPT = CGI_DIR + "get_file.cgi?id="
+var FILE_SCRIPT = CGI_DIR + "get_file.cgi?id=";
 
 /*  CROSS-SITE SCRIPTING PATHS (USED FOR TESTING)   */
 //var VIDEO_DIR = "http://192.168.1.100/video/";      // video directory of the server

@@ -8,7 +8,7 @@ function init()
     initContainers();
     initScreens();
     initTables();
-	initPlayer();
+    initPlayer();
 }
 
 /*
