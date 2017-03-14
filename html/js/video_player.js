@@ -237,7 +237,6 @@ function VideoPlayer () {
             season.id = "";
             season.textContent = _item.title;
             season.setAttribute("seasonID", _item.id);
-            //season.setAttribute("seasonsCount", _item.seasons);
             season.onclick = _evt => {
                 var seriesID = _evt.currentTarget.parentElement.getAttribute("seriesID"),
                     seasonID = _evt.currentTarget.getAttribute("seasonID");
