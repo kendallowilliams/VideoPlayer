@@ -205,8 +205,8 @@ function VideoPlayer () {
             var episode = document.getElementById("episode_template_div").cloneNode(true);
             episode.id = "";
             episode.textContent = _item.title;
-            //episode.setAttribute("seriesID", _item.id);
-            //episode.setAttribute("seasonsCount", _item.seasons);
+            episode.setAttribute("seriesID", _item.series_id);
+            episode.setAttribute("seasonID", _item.season_id);
             episode.onclick = _evt => null;
             if (_index < VIEWABLE_COUNT) /*then*/ episode.setAttribute("vp-visible", "1");
             this.VIEWS.episodesBrowser().appendChild(episode);
