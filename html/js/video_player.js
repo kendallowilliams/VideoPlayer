@@ -6,10 +6,10 @@ function VideoPlayer () {
         getSeriesHttpJSON = { type: "series" },
         getSeasonsHttpJSON = { type: "season" },
         getEpisodesHttpJSON = (_series, _season) => ({ type: "episode", series: _series, season: _season }),
-        currentScreen = null,
         VIEWABLE_COUNT = 7;
 
     this.SCREENS = { browser: 0, video: 1, invalid: 99 };
+    this.BROWSER_SCREENS = { series: 0, seasons: 1, episodes: 2, invalid: 99, edges: { min: 0, max: 2 } };
     
     this.VIEWS = {
         seriesHeader: () => document.querySelector(".series_header"),
@@ -101,12 +101,27 @@ function VideoPlayer () {
                     self.loadEpisodes(episodes);
                 }
             }
+        },
+        "currentScreen" : {
+            get: () => this._currentScreen || self.SCREENS.browser,
+            set: _value => {
+                this._currentScreen = _value === self.SCREENS.video ? self.SCREENS.browser : self.SCREENS.video;
+                self.showCurrentScreen();
+            }
+        },
+        "currentBrowserScreen": {
+            get: () => this._currentBrowserScreen || self.BROWSER_SCREENS.series,
+            set: _value => {
+                if (_value < self.BROWSER_SCREENS.edges.min) /*then*/ _value = self.BROWSER_SCREENS.edges.max;
+                else if (_value > self.BROWSER_SCREENS.edges.max) /*then*/ _value = self.BROWSER_SCREENS.edges.min;
+                this._currentBrowserScreen = _value;
+                self.switchBrowserScreen();
+            }
         }
     });
     
     this.initializeVideoPlayer = function () {
         this.initialized = false;
-        currentScreen = this.SCREENS.browser;
         this.loadData();
         this.initializeControls();
         this.showCurrentScreen();
@@ -130,16 +145,22 @@ function VideoPlayer () {
             _item().onmouseout = _evt => _evt.currentTarget.parentElement.setAttribute("vp-hover", "");
         });
         
-        this.CONTROL_BUTTONS.centerButton().onclick = () => {
-            var screen = (currentScreen === self.SCREENS.browser) ? self.SCREENS.video : self.SCREENS.browser;
-            currentScreen = screen;
-            self.showCurrentScreen();
+        this.CONTROL_BUTTONS.centerButton().onclick = () => self.currentScreen = self.currentScreen;
+        
+        this.CONTROL_BUTTONS.leftButton().onclick = () => {
+            if (self.currentScreen === self.SCREENS.browser) /*then*/ self.currentBrowserScreen--;
+            else if (self.currentScreen === self.SCREENS.video) /*then*/ null;
+        };
+        
+        this.CONTROL_BUTTONS.rightButton().onclick = () => {
+            if (self.currentScreen === self.SCREENS.browser) /*then*/ self.currentBrowserScreen++;
+            else if (self.currentScreen === self.SCREENS.video) /*then*/ null;
         };
 
     };
     
     this.showCurrentScreen = function () {
-        switch(currentScreen) {
+        switch(self.currentScreen) {
             case this.SCREENS.browser:
                 this.VIEWS.browserBox().setAttribute("vp-visible", "1");
                 this.VIEWS.videoBox().setAttribute("vp-visible", "0");
@@ -147,6 +168,24 @@ function VideoPlayer () {
             case this.SCREENS.video:
                 this.VIEWS.videoBox().setAttribute("vp-visible", "1");
                 this.VIEWS.browserBox().setAttribute("vp-visible", "0");
+                break;
+            case this.SCREENS.invalid:
+            default:
+                break;
+        }
+    };
+    
+    this.switchBrowserScreen = function () {
+        this.resetBrowserViews();
+        switch(self.currentBrowserScreen) {
+            case this.BROWSER_SCREENS.series:
+                this.showSeries();
+                break;
+            case this.BROWSER_SCREENS.seasons:
+                this.showSeasons();
+                break;
+            case this.BROWSER_SCREENS.episodes:
+                this.showEpisodes();
                 break;
             case this.SCREENS.invalid:
             default:
