@@ -4,9 +4,10 @@ function VideoPlayer () {
         fileUtility = "/cgi-bin/get_file.cgi",
         dataUtility = "/cgi-bin/video_player_cs.sh", /* _cs for debugging */
         getSeriesHttpJSON = { type: "series" },
-        getSeasonsHttpJSON = { type: "seasons" },
-        getEpisodesHttpJSON = (_series, _season) => ({ type: "series", series: _series, season: _season }),
-        currentScreen = null;
+        getSeasonsHttpJSON = { type: "season" },
+        getEpisodesHttpJSON = (_series, _season) => ({ type: "episode", series: _series, season: _season }),
+        currentScreen = null,
+        VIEWABLE_COUNT = 7;
 
     this.SCREENS = { browser: 0, video: 1, invalid: 99 };
     
@@ -23,6 +24,14 @@ function VideoPlayer () {
         
         videoBox: () => document.querySelector(".video_box"),
         browserBox: () => document.querySelector(".browser_box")
+    };
+    
+    this.CONTROL_BUTTONS = {
+        leftButton: () => document.querySelector(".controls_left_button"),
+        upButton: () => document.querySelector(".controls_up_button"),
+        centerButton: () => document.querySelector(".controls_center_button"),
+        rightButton: () => document.querySelector(".controls_right_button"),
+        downButton: () => document.querySelector(".controls_down_button")
     };
     
     Object.defineProperties(this, {
@@ -43,7 +52,7 @@ function VideoPlayer () {
                         for (var j = 0; j < fields.length; j++) {
                             oSeries[fields[j].getAttribute("name")] = fields[j].textContent;
                         }
-                        series.push(oSeries)
+                        series.push(oSeries);
                     }
                     
                     this._seriesData = series;
@@ -55,7 +64,18 @@ function VideoPlayer () {
             get: () => this._seasonData,
             set: _value => {
                 if (_value) {
-                    var seasons = XML.getXMLDocFromString(_value).getElementsByTagName("row");
+                    var rows = XML.getXMLDocFromString(_value).getElementsByTagName("row"),
+                        seasons = [];
+                    
+                    for (var i = 0; i < rows.length; i++) {
+                        var oSeason = {},
+                            fields = rows[i].getElementsByTagName("field");
+                        for (var j = 0; j < fields.length; j++) {
+                            oSeason[fields[j].getAttribute("name")] = fields[j].textContent;
+                        }
+                        seasons.push(oSeason);
+                    }
+                    
                     this._seasonData = seasons;
                     self.loadSeasons(seasons);
                 }
@@ -65,7 +85,18 @@ function VideoPlayer () {
             get: () => this._episodeData,
             set: _value => {
                 if (_value) {
-                    var episodes = XML.getXMLDocFromString(_value).getElementsByTagName("row");
+                    var rows = XML.getXMLDocFromString(_value).getElementsByTagName("row"),
+                        episodes = [];
+                    
+                    for (var i = 0; i < rows.length; i++) {
+                        var oEpisode = {},
+                            fields = rows[i].getElementsByTagName("field");
+                        for (var j = 0; j < fields.length; j++) {
+                            oEpisode[fields[j].getAttribute("name")] = fields[j].textContent;
+                        }
+                        episodes.push(oEpisode);
+                    }
+                    
                     this._episodeData = episodes;
                     self.loadEpisodes(episodes);
                 }
@@ -75,24 +106,47 @@ function VideoPlayer () {
     
     this.initializeVideoPlayer = function () {
         this.initialized = false;
-        this.resetBrowserViews();
         currentScreen = this.SCREENS.browser;
         this.loadData();
+        this.initializeControls();
         this.showCurrentScreen();
         this.initialized = true;
     };
     
     this.loadData = function () {
         this.getSeries();
+        this.getSeasons();
+    };
+    
+    this.initializeControls = function () {
+        this.CONTROL_BUTTONS.downButton().setAttribute("vp-button","down");
+        this.CONTROL_BUTTONS.leftButton().setAttribute("vp-button","left");
+        this.CONTROL_BUTTONS.rightButton().setAttribute("vp-button","right");
+        this.CONTROL_BUTTONS.upButton().setAttribute("vp-button","up");
+        this.CONTROL_BUTTONS.centerButton().setAttribute("vp-button","center");
+        
+        Object.values(this.CONTROL_BUTTONS).forEach(_item => {
+            _item().onmouseover = _evt => _evt.currentTarget.parentElement.setAttribute("vp-hover", _evt.currentTarget.getAttribute("vp-button"));
+            _item().onmouseout = _evt => _evt.currentTarget.parentElement.setAttribute("vp-hover", "");
+        });
+        
+        this.CONTROL_BUTTONS.centerButton().onclick = () => {
+            var screen = (currentScreen === self.SCREENS.browser) ? self.SCREENS.video : self.SCREENS.browser;
+            currentScreen = screen;
+            self.showCurrentScreen();
+        };
+
     };
     
     this.showCurrentScreen = function () {
         switch(currentScreen) {
             case this.SCREENS.browser:
                 this.VIEWS.browserBox().setAttribute("vp-visible", "1");
+                this.VIEWS.videoBox().setAttribute("vp-visible", "0");
                 break;
             case this.SCREENS.video:
                 this.VIEWS.videoBox().setAttribute("vp-visible", "1");
+                this.VIEWS.browserBox().setAttribute("vp-visible", "0");
                 break;
             case this.SCREENS.invalid:
             default:
@@ -113,14 +167,22 @@ function VideoPlayer () {
             this.VIEWS.seriesBrowser().removeChild(this.VIEWS.seriesBrowser().firstChild);
         }
         
-        _data.forEach(_item => {
-            var series = document.createElement("div");
+        _data.forEach((_item, _index) => {
+            var series = document.getElementById("series_template_div").cloneNode(true);
+            series.id = "";
             series.textContent = _item.title;
+            series.setAttribute("seriesID", _item.id);
+            series.setAttribute("seasonsCount", _item.seasons);
+            series.onclick = _evt => self.showSeasons(_evt.currentTarget.getAttribute("seriesID"),
+                                                     _evt.currentTarget.getAttribute("seasonsCount"));
+            if (_index < VIEWABLE_COUNT) /*then*/ series.setAttribute("vp-visible", "1");
+            this.VIEWS.seasonsBrowser().setAttribute("seriesID", _item.id);
             this.VIEWS.seriesBrowser().appendChild(series);
         });
     };
     
     this.showSeries = function () {
+        self.resetBrowserViews();
         self.VIEWS.seriesBrowser().setAttribute("vp-visible", "1");
         self.VIEWS.seriesHeader().setAttribute("vp-visible", "1");
         self.VIEWS.seriesFooter().setAttribute("vp-visible", "1");
@@ -128,34 +190,80 @@ function VideoPlayer () {
     
     this.getEpisodes = function (_series, _season) {
         var path = domain + dataUtility;
-        HTTP.get(path, getSeriesHttpJSON)
-            .then(_value => self.seriesData = _value);
+        HTTP.get(path, getEpisodesHttpJSON(_series, _season))
+            .then(_value => self.episodeData = _value)
+            .then(this.showEpisodes);
     };
     
     this.loadEpisodes = function (_data) {
+        while(this.VIEWS.episodesBrowser().firstChild)
+        {
+            this.VIEWS.episodesBrowser().removeChild(this.VIEWS.episodesBrowser().firstChild);
+        }
         
+        _data.forEach((_item, _index) => {
+            var episode = document.getElementById("episode_template_div").cloneNode(true);
+            episode.id = "";
+            episode.textContent = _item.title;
+            //episode.setAttribute("seriesID", _item.id);
+            //episode.setAttribute("seasonsCount", _item.seasons);
+            episode.onclick = _evt => null;
+            if (_index < VIEWABLE_COUNT) /*then*/ episode.setAttribute("vp-visible", "1");
+            this.VIEWS.episodesBrowser().appendChild(episode);
+        });
     };
     
     this.showEpisodes = function () {
-        this.VIEWS.episodesBrowser().setAttribute("vp-visible", "1");
-        this.VIEWS.episodesHeader().setAttribute("vp-visible", "1");
-        this.VIEWS.episodesFooter().setAttribute("vp-visible", "1");
+        self.resetBrowserViews();
+        self.VIEWS.episodesBrowser().setAttribute("vp-visible", "1");
+        self.VIEWS.episodesHeader().setAttribute("vp-visible", "1");
+        self.VIEWS.episodesFooter().setAttribute("vp-visible", "1");
     };
     
-    this.getSeasons = function (_series) {
+    this.getSeasons = function () {
         var path = domain + dataUtility;
-        HTTP.get(path, getSeriesHttpJSON)
-            .then(_value => self.seriesData = _value);
+        HTTP.get(path, getSeasonsHttpJSON)
+            .then(_value => self.seasonData = _value);
     };
     
     this.loadSeasons = function (_data) {
+        while(this.VIEWS.seasonsBrowser().firstChild)
+        {
+            this.VIEWS.seasonsBrowser().removeChild(this.VIEWS.seasonsBrowser().firstChild);
+        }
         
+        _data.forEach((_item, _index) => {
+            var season = document.getElementById("season_template_div").cloneNode(true);
+            season.id = "";
+            season.textContent = _item.title;
+            season.setAttribute("seasonID", _item.id);
+            //season.setAttribute("seasonsCount", _item.seasons);
+            season.onclick = _evt => {
+                var seriesID = _evt.currentTarget.parentElement.getAttribute("seriesID"),
+                    seasonID = _evt.currentTarget.getAttribute("seasonID");
+                self.getEpisodes(seriesID, seasonID);
+                self.VIEWS.episodesBrowser().setAttribute("seriesID", seriesID);
+                self.VIEWS.episodesBrowser().setAttribute("seasonID", seasonID);
+            };
+            this.VIEWS.seasonsBrowser().appendChild(season);
+        });
     };
     
-    this.showSeasons = function () {
+    this.showSeasons = function (_series, _count) {
+        var seasons = this.VIEWS.seasonsBrowser().querySelectorAll(".season_template");
+        
+        this.resetBrowserViews();
         this.VIEWS.seasonsBrowser().setAttribute("vp-visible", "1");
         this.VIEWS.seasonsHeader().setAttribute("vp-visible", "1");
         this.VIEWS.seasonsFooter().setAttribute("vp-visible", "1");
+        
+        if (_series && _count) {
+            seasons.forEach((_item, _index) => {
+                if (_index < VIEWABLE_COUNT && _index < _count) {
+                   _item.setAttribute("vp-visible", "1") 
+                }
+            });
+        }
     };
     
     this.resetBrowserViews = function () {
