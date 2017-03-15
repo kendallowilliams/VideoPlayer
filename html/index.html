@@ -12,12 +12,13 @@
         <link rel="stylesheet" href="CSS/style.css" type="text/css" />
         <script type="text/javascript" src="js/video_player.js"></script>
         <script type="text/javascript">
-            function init() {
-                var videoPlayer = new VideoPlayer();
-            }
+            var videoPlayer = null;
+        
+            window.onload = () => videoPlayer = new VideoPlayer();
+            document.onselectstart = function () { return false; };
         </script>
     </head>
-    <body onload="init()">
+    <body>
         <div class="page">
             <div class="header">KOWflix</div>
             <div class="main">
@@ -28,7 +29,7 @@
                 </div>
                 <div class="screen_box">
                     <div class="video_box">
-                        <video id="video" controls="controls" ontimeupdate="" onended=""></video>
+                        <video id="video" controls="controls" ontimeupdate="" onended="" autoplay="autoplay"></video>
                     </div>
                     <div class="browser_box">
                         <div class="browser_box_header">
@@ -38,8 +39,12 @@
                         </div>
                         <div class="browser_box_main">
                             <div class="series_browser"></div>
-                            <div class="seasons_browser">Go back: select a <i>series</i> to view seasons.</div>
-                            <div class="episodes_browser">Go back: select a <i>season</i> to view episodes.</div>
+                            <div class="seasons_browser">
+                                <div class="default_season_template">Go back: select a&nbsp;<i>series</i>&nbsp;to view seasons.</div>
+                            </div>
+                            <div class="episodes_browser">
+                                <div class="default_episode_template">Go back: select a&nbsp;<i>season</i>&nbsp;to view episodes.</div>
+                            </div>
                         </div>
                         <div class="browser_box_footer">
                             <div class="series_footer">&#8678; Go to Episodes &#8226; Go to Seasons &#8680; &#8226; &#8679; Move up &#8226; Move down &#8681;</div>

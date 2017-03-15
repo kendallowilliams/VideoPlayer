@@ -152,6 +152,18 @@ video {
     color: white;
 }
 
+.default_episode_template, .default_season_template {
+    font-size: 2vh;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.default_episode_template[vp-hidden="1"], .default_season_template[vp-hidden="1"] {
+    display: none;
+}
+
 /* CONTROLS */
 
 .controls_box[vp-hover="left"] {
