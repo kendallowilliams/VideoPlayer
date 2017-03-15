@@ -447,8 +447,7 @@ function VideoPlayer () {
             var seasonsBrowser = this.VIEWS.seasonsBrowser(),
                 currentSeason = seasonsBrowser.querySelector(".season_template[seasonID='" + currentEpisode.getAttribute("seasonID") + "']"),
                 nextSeason = currentSeason ? currentSeason.nextElementSibling : null;
-        
-            if (nextSeason.isSameNode(seasonsBrowser.firstElementChild)) /*then*/ nextSeason = nextSeason.nextElementSibling;
+            
             if (nextSeason) /*then*/ nextSeason.click();
             else /*then*/ self.playing = false;
         }
