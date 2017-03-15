@@ -125,7 +125,7 @@ function VideoPlayer () {
             set: _value => {
                 var volume = _value;
                 
-                if (_value < 0) /*then*/ volume = 0;
+                if (_value <= 0) /*then*/ volume = 0;
                 else if (_value > 10.0) /*then*/ volume = 10.0;
                 
                 this._volume = volume;
@@ -447,8 +447,7 @@ function VideoPlayer () {
             var seasonsBrowser = this.VIEWS.seasonsBrowser(),
                 currentSeason = seasonsBrowser.querySelector(".season_template[seasonID='" + currentEpisode.getAttribute("seasonID") + "']"),
                 nextSeason = currentSeason ? currentSeason.nextElementSibling : null;
-        
-            if (nextSeason.isSameNode(seasonsBrowser.firstElementChild)) /*then*/ nextSeason = nextSeason.nextElementSibling;
+            
             if (nextSeason) /*then*/ nextSeason.click();
             else /*then*/ self.playing = false;
         }
