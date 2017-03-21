@@ -143,12 +143,11 @@ function VideoPlayer () {
             }
         },
         "autoplay": {
-            get: () => this._autoplay,
+            get: () => this._autoplay || false,
             set: _value => this._autoplay = _value
         },
         "playing": {
-            get: () => this._playing,
-            set: _value => this._playing = _value
+            get: () => this.VIDEO().playing
         }
     });
     
@@ -210,6 +209,10 @@ function VideoPlayer () {
         
         player.onerror = function () {
             self.playNextEpisode();
+        };
+        
+        player.onplay = function () {
+            self.autoplay = true;  
         };
     };
     
@@ -336,7 +339,7 @@ function VideoPlayer () {
             .then(_value => self.episodeData = _value)
             .then(this.showEpisodes)
             .then(() => { 
-                if (self.playing) /*then*/ self.VIEWS.episodesBrowser().firstElementChild.click()
+                if (self.autoplay) /*then*/ self.VIEWS.episodesBrowser().firstElementChild.click()
             });
     };
     
@@ -361,7 +364,6 @@ function VideoPlayer () {
                 _evt.currentTarget.setAttribute("vp-playing", "1");
                 self.VIDEO().src = fileUtility + _evt.currentTarget.getAttribute("episodeID");
                 self.currentScreen = self.SCREENS.video;
-                self.playing = true;
             };
             if (count < VIEWABLE_COUNT && _index >= _start) /*then*/ episode.setAttribute("vp-visible", "1");
             episodesBrowser.appendChild(episode);
@@ -409,6 +411,7 @@ function VideoPlayer () {
         self.currentBrowserScreen = self.BROWSER_SCREENS.seasons;
         browser.setAttribute("seriesID", _series);
         browser.setAttribute("startIndex", _start);
+        self.autoplay = false;
         
         if (_series && _count) {
             browser.firstElementChild.setAttribute("vp-hidden", "1");
@@ -441,7 +444,6 @@ function VideoPlayer () {
             currentEpisode = episodesBrowser.querySelector(".episode_template[vp-playing='1']"),
             nextEpisode = currentEpisode ? currentEpisode.nextElementSibling : null;
         
-        self.playing = true;
         if (nextEpisode && !nextEpisode.isSameNode(episodesBrowser.lastElementChild)) /*then*/ nextEpisode.click();
         else {
             var seasonsBrowser = this.VIEWS.seasonsBrowser(),
@@ -450,7 +452,7 @@ function VideoPlayer () {
         
             if (nextSeason.isSameNode(seasonsBrowser.firstElementChild)) /*then*/ nextSeason = nextSeason.nextElementSibling;
             if (nextSeason) /*then*/ nextSeason.click();
-            else /*then*/ self.playing = false;
+            else /*then*/ self.autoplay = false;
         }
     };
     
