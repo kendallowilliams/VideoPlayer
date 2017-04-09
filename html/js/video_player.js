@@ -121,7 +121,7 @@ function VideoPlayer () {
             }
         },
         "volume" : {
-            get: () => this._volume || 10.0,
+            get: () => this._volume ? this._volume : (this._volume === 0 ? 0 : 10.0),
             set: _value => {
                 var volume = _value;
                 
