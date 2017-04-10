@@ -20,9 +20,9 @@
             document.onselectstart = function () { return false; };
             
             window.onerror = function (_error, _source, _line, _column) {
-                var path = self.domain + self.dataUtility,
+                var path = "",
                     error = { error: _error, source: _source, line: _line, column: _column };
-                HTTP.post(path, { utility: 5, action: 61, value: JSON.stringify(error) });
+                /*HTTP.post(path, { value: JSON.stringify(error) });*/
             };
         </script>
     </head>
