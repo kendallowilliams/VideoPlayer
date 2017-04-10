@@ -14,7 +14,7 @@
 #include <mysql/mysql.h>
 #include <time.h>
 
-#define BUFF_LENGTH     256
+#define BUFF_LENGTH     8000
 #define MAX_LOG_SIZE    512000  // limit file size to 512KB; may change
 #define LOG_PATH        "/STORAGE/online_video/logs/"
 
@@ -93,6 +93,7 @@ void print_file(FILE *file, size_t first, size_t last)
     {
         fread(str, sizeof(char), BUFF_LENGTH, file);
         fwrite(str, sizeof(char), BUFF_LENGTH, stdout);
+        fflush(stdout);
         length -= BUFF_LENGTH;
     }
     
@@ -100,6 +101,7 @@ void print_file(FILE *file, size_t first, size_t last)
     {
         fread(str, sizeof(char), length, file);
         fwrite(str, sizeof(char), length, stdout);
+        fflush(stdout);
         length = 0;
     }
 }
